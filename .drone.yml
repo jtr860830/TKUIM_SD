@@ -1,0 +1,12 @@
+pipeline:
+  build:
+    image: golang:${GO_VERSION}
+    commands:
+      - go get -u golang.org/x/vgo
+      - vgo build
+      - ./SD-Backend
+
+matrix:
+  GO_VERSION:
+    - 1.9
+    - 1.10
