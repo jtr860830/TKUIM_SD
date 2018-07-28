@@ -1,11 +1,4 @@
 pipeline:
-  notify:
-    image: plugins/slack
-    webhook: https://hooks.slack.com/services/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
-    channel: backend
-    username: Drone
-    when:
-      status: [ success, failure ]
 
   build:
     image: golang
@@ -13,3 +6,11 @@ pipeline:
       - go get -u golang.org/x/vgo
       - CC=gcc vgo build
       - vgo test
+
+  notify:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: backend
+    username: Drone
+    when:
+      status: [ success, failure ]
