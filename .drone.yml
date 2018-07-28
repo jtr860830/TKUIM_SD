@@ -4,8 +4,8 @@ pipeline:
     image: golang
     commands:
       - go get -u golang.org/x/vgo
-      - CGO_ENABLED=0 vgo build
-      - vgo test
+      - vgo build
+      - CC=gcc vgo test
 
   notify:
     image: plugins/slack
