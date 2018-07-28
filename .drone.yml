@@ -4,7 +4,7 @@ pipeline:
     commands:
       - go get -u golang.org/x/vgo
       - vgo build
-      - ./SD-Backend
+      - vgo test
 
 matrix:
   GO_VERSION:
