@@ -4,7 +4,7 @@ pipeline:
     image: golang
     commands:
       - go get -u golang.org/x/vgo
-      - CC=gcc vgo build
+      - CGO_ENABLED=0 vgo build
       - vgo test
 
   notify:
