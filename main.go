@@ -8,6 +8,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func main() {
@@ -83,7 +85,11 @@ func logoutHandler(c *gin.Context) {
 }
 
 func registerHandler(c *gin.Context) {
-
+	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 }
 
 func profileHandler(c *gin.Context) {
