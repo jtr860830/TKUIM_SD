@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -44,6 +45,7 @@ func auth() gin.HandlerFunc {
 			c.String(http.StatusNotAcceptable, "You should not pass!")
 			log.Println("A strangers attempted to log in!")
 		} else {
+			log.Println(user)
 			c.Next()
 		}
 	}
@@ -90,10 +92,53 @@ func registerHandler(c *gin.Context) {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
+	username := c.PostForm("username")
+	password := c.PostForm("Password")
+	email := c.PostForm("email")
+	birthday, _ := time.Parse("0000-00-00 00:00:00", c.PostForm("birthday"))
+
+	if strings.Trim(username, " ") == "" || strings.Trim(password, " ") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameters can't be empty"})
+		return
+	}
+
+	var user = User{
+		Username: username,
+		Password: password,
+		Email:    email,
+		Birthday: birthday,
+	}
+
+	if err = db.Create(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
 func profileHandler(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	session := sessions.Default(c)
-	user := session.Get("user")
-	c.JSON(http.StatusOK, user)
+	username := session.Get("user").(string)
+
+	user := User{}
+	if err := db.Where(&User{Username: username}).First(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusOK,
+		gin.H{
+			"username": user.Username,
+			"email":    user.Email,
+			"birthday": user.Birthday,
+			"sticker":  user.Sticker,
+		},
+	)
 }
