@@ -40,7 +40,7 @@ func main() {
 }
 
 func initDB() {
-	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Fatal(err)
 		return
