@@ -25,14 +25,13 @@ func main() {
 	route.GET("/logout", logoutHandler)
 	route.POST("/register", registerHandler)
 
-	account := route.Group("/user")
+	account := route.Group("/user", auth())
 	{
 		account.GET("/", func(c *gin.Context) {
 			c.Redirect(301, "/user/profile")
 		})
 		account.GET("/profile", profileHandler)
 	}
-	account.Use(auth())
 
 	route.Run(":8080")
 }
@@ -44,8 +43,8 @@ func auth() gin.HandlerFunc {
 		if user == nil {
 			c.String(http.StatusNotAcceptable, "You should not pass!")
 			log.Println("A strangers attempted to log in!")
+			c.Abort()
 		} else {
-			log.Println(user)
 			c.Next()
 		}
 	}
