@@ -40,6 +40,7 @@ func initDB() {
 	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 	defer db.Close()
 
@@ -74,16 +75,31 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Parameters can't be empty"})
 		return
 	}
-	if username == "hello" && password == "itsme" {
-		session.Set("user", username)
-		err := session.Save()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate session token"})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
-		}
+
+	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Fatal(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+		return
+	}
+	defer db.Close()
+
+	user := User{}
+	if err := db.Where(&User{Username: username}).Find(&user); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid username or password"})
+		return
+	}
+	if user.Password != password {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid username or password"})
+		return
+	}
+
+	session.Set("user", username)
+	err = session.Save()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate session token"})
 	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed"})
+		c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
 	}
 }
 
@@ -104,6 +120,8 @@ func registerHandler(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Fatal(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+		return
 	}
 	defer db.Close()
 
@@ -125,7 +143,7 @@ func registerHandler(c *gin.Context) {
 	}
 
 	if err = db.Create(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -136,6 +154,8 @@ func profileHandler(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Fatal(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+		return
 	}
 	defer db.Close()
 
@@ -144,7 +164,7 @@ func profileHandler(c *gin.Context) {
 
 	user := User{}
 	if err := db.Where(&User{Username: username}).First(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 	c.JSON(http.StatusOK,
