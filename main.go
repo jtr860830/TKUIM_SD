@@ -36,6 +36,21 @@ func main() {
 	route.Run(":8080")
 }
 
+func initDB() {
+	db, err := gorm.Open("mysql", "root:sd2018@/sd2018DB?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	if !db.HasTable(&User{}) {
+		db.AutoMigrate(&User{}, &Group{}, &userSchedule{}, &groupSchedule{}, &backup{})
+		db.Model(&userSchedule{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
+		db.Model(&backup{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
+		db.Model(&groupSchedule{}).AddForeignKey("group_id", "users(id)", "RESTRICT", "RESTRICT")
+	}
+}
+
 func auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
