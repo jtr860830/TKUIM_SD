@@ -14,6 +14,9 @@ import (
 )
 
 func main() {
+
+	initDB()
+
 	route := gin.Default()
 	store := cookie.NewStore([]byte("secret-string"))
 	route.Use(sessions.Sessions("session", store))
