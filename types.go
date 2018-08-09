@@ -22,7 +22,7 @@ type User struct {
 // Group data model
 type Group struct {
 	gorm.Model
-	Name     string
+	Name     string `gorm:"unique;not null"`
 	Color    string
 	Sticker  string
 	Users    []*User `gorm:"many2many:user_group;"`
