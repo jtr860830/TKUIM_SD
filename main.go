@@ -59,7 +59,7 @@ func main() {
 func initDB() {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	defer db.Close()
@@ -98,7 +98,7 @@ func loginHandler(c *gin.Context) {
 
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -139,7 +139,7 @@ func logoutHandler(c *gin.Context) {
 func registerHandler(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -173,7 +173,7 @@ func registerHandler(c *gin.Context) {
 func profileHandler(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -200,7 +200,7 @@ func profileHandler(c *gin.Context) {
 func getFriendHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -227,7 +227,7 @@ func getFriendHdlr(c *gin.Context) {
 func addFriendHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -261,7 +261,7 @@ func addFriendHdlr(c *gin.Context) {
 func rmFriendHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -295,7 +295,7 @@ func rmFriendHdlr(c *gin.Context) {
 func getScheduleHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -319,7 +319,7 @@ func getScheduleHdlr(c *gin.Context) {
 func addScheduleHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -367,7 +367,7 @@ func udScheduleHdlr(c *gin.Context) {
 func rmScheduleHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
