@@ -118,22 +118,21 @@ func loginHandler(c *gin.Context) {
 	err = session.Save()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate session token"})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
 	}
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
 }
 
 func logoutHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get("user")
+
 	if user == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid session token"})
-	} else {
-		log.Println(user)
-		session.Delete("user")
-		session.Save()
-		c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 	}
+
+	session.Delete("user")
+	session.Save()
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 }
 
 func registerHandler(c *gin.Context) {
@@ -146,12 +145,12 @@ func registerHandler(c *gin.Context) {
 	defer db.Close()
 
 	username := c.PostForm("username")
-	password := c.PostForm("Password")
+	password := c.PostForm("password")
 	email := c.PostForm("email")
 	birthday, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("birthday"))
 
 	if strings.Trim(username, " ") == "" || strings.Trim(password, " ") == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameters can't be empty"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Parameters can't be empty"})
 		return
 	}
 
@@ -163,7 +162,7 @@ func registerHandler(c *gin.Context) {
 	}
 
 	if err := db.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"massage": "Can't use this username or password"})
 		return
 	}
 
@@ -187,14 +186,8 @@ func profileHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
-	c.JSON(http.StatusOK,
-		gin.H{
-			"username": user.Username,
-			"email":    user.Email,
-			"birthday": user.Birthday,
-			"sticker":  user.Sticker,
-		},
-	)
+
+	c.JSON(http.StatusOK, user)
 }
 
 func getFriendHdlr(c *gin.Context) {
