@@ -498,6 +498,6 @@ func rmBackupHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func getGroupsHdlr(c *gin.Context) {
+func getGroupHdlr(c *gin.Context) {
 
 }
