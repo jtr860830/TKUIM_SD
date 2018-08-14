@@ -26,17 +26,17 @@ func main() {
 		c.String(http.StatusOK, "Home Page")
 	})
 
-	route.POST("/login", loginHandler)
-	route.GET("/logout", logoutHandler)
-	route.POST("/register", registerHandler)
+	route.POST("/login", loginHdlr)
+	route.GET("/logout", logoutHdlr)
+	route.POST("/register", registerHdlr)
 
 	account := route.Group("/user", auth())
 	{
 		account.GET("/", func(c *gin.Context) {
-			c.Redirect(301, "/user/profile")
+			c.Redirect(http.StatusMovedPermanently, "/user/profile")
 		})
 
-		account.GET("/profile", profileHandler)
+		account.GET("/profile", profileHdlr)
 
 		account.GET("/friends", getFriendHdlr)
 		account.PATCH("/friends", addFriendHdlr)
@@ -46,6 +46,10 @@ func main() {
 		account.POST("/schedules", addScheduleHdlr)
 		account.PATCH("/schedules", udScheduleHdlr)
 		account.DELETE("/schedules", rmScheduleHdlr)
+
+		account.GET("/backups", getBackupHdlr)
+		account.POST("/backups", addBackupHdlr)
+		account.DELETE("/backups", rmBackupHdlr)
 
 		group := account.Group("/group")
 		{
@@ -86,7 +90,7 @@ func auth() gin.HandlerFunc {
 	}
 }
 
-func loginHandler(c *gin.Context) {
+func loginHdlr(c *gin.Context) {
 	session := sessions.Default(c)
 	username := c.PostForm("username")
 	password := c.PostForm("password")
@@ -122,7 +126,7 @@ func loginHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
 }
 
-func logoutHandler(c *gin.Context) {
+func logoutHdlr(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get("user")
 
@@ -135,7 +139,7 @@ func logoutHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 }
 
-func registerHandler(c *gin.Context) {
+func registerHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Println(err)
@@ -169,7 +173,7 @@ func registerHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
-func profileHandler(c *gin.Context) {
+func profileHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Println(err)
@@ -208,13 +212,12 @@ func getFriendHdlr(c *gin.Context) {
 		return
 	}
 
-	friends := user.Friend
-	if friends == nil {
+	if user.Friend == nil {
 		c.JSON(http.StatusOK, gin.H{"message": "You don't have any friends"})
 		return
 	}
 
-	c.JSON(http.StatusOK, friends)
+	c.JSON(http.StatusOK, user.Friend)
 }
 
 func addFriendHdlr(c *gin.Context) {
@@ -304,9 +307,7 @@ func getScheduleHdlr(c *gin.Context) {
 		return
 	}
 
-	schedules := user.Schedule
-
-	c.JSON(http.StatusOK, schedules)
+	c.JSON(http.StatusOK, user.Schedule)
 }
 
 func addScheduleHdlr(c *gin.Context) {
@@ -405,4 +406,98 @@ func rmScheduleHdlr(c *gin.Context) {
 
 func getGroupHdlr(c *gin.Context) {
 
+}
+
+func getBackupHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	user := User{}
+
+	if err := db.Where(&User{Username: username}).Preload("backup").First(&user).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user.Backup)
+}
+
+func addBackupHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	info := c.PostForm("info")
+
+	if strings.Trim(info, " ") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Parameters can't be empty"})
+		return
+	}
+
+	user := User{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
+		return
+	}
+
+	if err := db.Model(&user).Association("backup").Append(backup{Info: info}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+func rmBackupHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	info := c.PostForm("info")
+
+	user := User{}
+	bp := backup{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
+		return
+	}
+
+	if err := db.Where(&backup{
+		UserID: user.ID,
+		Info:   info,
+	}).First(&bp).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "You don't have this backup"})
+		return
+	}
+
+	if err := db.Delete(&bp).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
