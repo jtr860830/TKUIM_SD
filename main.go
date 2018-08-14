@@ -404,10 +404,6 @@ func rmScheduleHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func getGroupHdlr(c *gin.Context) {
-
-}
-
 func getBackupHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
@@ -422,7 +418,7 @@ func getBackupHdlr(c *gin.Context) {
 
 	user := User{}
 
-	if err := db.Where(&User{Username: username}).Preload("backup").First(&user).Error; err != nil {
+	if err := db.Where(&User{Username: username}).Preload("Backup").First(&user).Error; err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
 		return
 	}
@@ -456,7 +452,7 @@ func addBackupHdlr(c *gin.Context) {
 		return
 	}
 
-	if err := db.Model(&user).Association("backup").Append(backup{Info: info}).Error; err != nil {
+	if err := db.Model(&user).Association("Backup").Append(backup{Info: info}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error"})
 		return
 	}
@@ -500,4 +496,8 @@ func rmBackupHdlr(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+func getGroupsHdlr(c *gin.Context) {
+
 }
