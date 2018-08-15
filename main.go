@@ -39,7 +39,7 @@ func main() {
 		account.GET("/profile", profileHdlr)
 
 		account.GET("/friends", getFriendHdlr)
-		account.PATCH("/friends", addFriendHdlr)
+		account.POST("/friends", addFriendHdlr)
 		account.DELETE("/friends", rmFriendHdlr)
 
 		account.GET("/schedules", getScheduleHdlr)
@@ -54,6 +54,15 @@ func main() {
 		group := account.Group("/group")
 		{
 			group.GET("/", getGroupHdlr)
+			group.POST("/", createGroupHdlr)
+
+			group.GET("/member", getMemberHdlr)
+			group.POST("/member", addMemberHdlr)
+			group.DELETE("/member", rmMemberHdlr)
+
+			group.GET("/schedules", getGroupScheduleHdlr)
+			group.POST("/schedules", addGroupScheduleHdlr)
+			group.DELETE("/schedules", rmGroupScheduleHdlr)
 		}
 	}
 
@@ -478,7 +487,7 @@ func rmBackupHdlr(c *gin.Context) {
 	bp := backup{}
 
 	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
@@ -499,5 +508,270 @@ func rmBackupHdlr(c *gin.Context) {
 }
 
 func getGroupHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
 
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	user := User{}
+
+	if err := db.Where(&User{Username: username}).Preload("Groups").First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not Found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user.Groups)
+}
+
+func createGroupHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	name := c.PostForm("name")
+	color := c.PostForm("color")
+	sticker := c.PostForm("sticker")
+
+	user := User{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
+		return
+	}
+
+	if err := db.Model(&user).Association("Groups").Append(Group{
+		Name:    name,
+		Color:   color,
+		Sticker: sticker,
+	}).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid group name or database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+func getMemberHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	name := c.PostForm("name")
+
+	group := Group{}
+
+	if err := db.Where(&Group{Name: name}).Preload("Users").First(&group).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, group.Users)
+}
+
+func addMemberHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	username := c.PostForm("username")
+	name := c.PostForm("name")
+
+	user := User{}
+	group := Group{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
+		return
+	}
+
+	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
+		return
+	}
+
+	if err := db.Model(&user).Association("Groups").Append(group).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+func rmMemberHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	username := c.PostForm("username")
+	name := c.PostForm("name")
+
+	user := User{}
+	group := Group{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
+		return
+	}
+
+	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
+		return
+	}
+
+	if err := db.Model(&user).Association("Groups").Delete(group).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+func getGroupScheduleHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	name := c.PostForm("name")
+
+	group := Group{}
+
+	if err := db.Where(&Group{Name: name}).Preload("Schedule").First(&group).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, group.Schedule)
+}
+
+func addGroupScheduleHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	name := c.PostForm("name")
+	event := c.PostForm("event")
+	eventTime, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("time"))
+	location := c.PostForm("location")
+	color := c.PostForm("color")
+	note := c.PostForm("note")
+
+	if strings.Trim(event, " ") == "" || strings.Trim(eventTime.String(), " ") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Event and time can't be empty"})
+		return
+	}
+
+	user := User{}
+	group := Group{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
+		return
+	}
+
+	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
+		return
+	}
+
+	if err := db.Model(&group).Association("Schedule").Append(groupSchedule{
+		SponsorID: user.ID,
+		Event:     event,
+		Time:      eventTime,
+		Location:  location,
+		Color:     color,
+		Note:      note,
+	}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+func rmGroupScheduleHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	name := c.PostForm("name")
+	event := c.PostForm("event")
+	eventTime, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("time"))
+	location := c.PostForm("location")
+	color := c.PostForm("color")
+	note := c.PostForm("note")
+
+	user := User{}
+	group := Group{}
+	schedule := groupSchedule{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
+		return
+	}
+
+	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
+		return
+	}
+
+	if err := db.Where(&groupSchedule{
+		SponsorID: user.ID,
+		Event:     event,
+		Time:      eventTime,
+		Location:  location,
+		Color:     color,
+		Note:      note,
+	}).First(&schedule).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "You don't have this schedule"})
+		return
+	}
+
+	if err := db.Delete(&schedule).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
