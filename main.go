@@ -38,6 +38,8 @@ func main() {
 
 		account.GET("/profile", profileHdlr)
 
+		account.POST("/chpasswd", chpasswdHdlr)
+
 		account.GET("/friends", getFriendHdlr)
 		account.POST("/friends", addFriendHdlr)
 		account.DELETE("/friends", rmFriendHdlr)
@@ -201,6 +203,41 @@ func profileHdlr(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func chpasswdHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	db.Close()
+
+	session := sessions.Default(c)
+	username := session.Get("user").(string)
+
+	opasswd := c.PostForm("orpassword")
+	cpasswd := c.PostForm("chpassword")
+
+	user := User{}
+
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
+		return
+	}
+
+	if opasswd != user.Password {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Original password not match"})
+		return
+	}
+
+	if err := db.Model(&user).Update("password", cpasswd).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
 func getFriendHdlr(c *gin.Context) {
