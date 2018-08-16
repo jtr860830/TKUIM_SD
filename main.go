@@ -160,7 +160,7 @@ func registerHdlr(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	email := c.PostForm("email")
-	birthday, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("birthday"))
+	birthday, _ := time.Parse(time.RFC3339, c.PostForm("birthday"))
 
 	if strings.Trim(username, " ") == "" || strings.Trim(password, " ") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Parameters can't be empty"})
@@ -332,7 +332,7 @@ func addScheduleHdlr(c *gin.Context) {
 	username := session.Get("user").(string)
 
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("time"))
+	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
@@ -380,7 +380,7 @@ func rmScheduleHdlr(c *gin.Context) {
 	username := session.Get("user").(string)
 
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("time"))
+	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
@@ -685,7 +685,7 @@ func addGroupScheduleHdlr(c *gin.Context) {
 
 	name := c.PostForm("name")
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("time"))
+	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
@@ -737,7 +737,7 @@ func rmGroupScheduleHdlr(c *gin.Context) {
 
 	name := c.PostForm("name")
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse("1997-05-17 12:00:00 +0000 UTC", c.PostForm("time"))
+	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
