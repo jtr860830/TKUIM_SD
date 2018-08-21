@@ -53,6 +53,7 @@ type groupSchedule struct {
 type backup struct {
 	gorm.Model
 	UserID     uint
+	Title      string
 	Info       string
 	Importance int
 }
