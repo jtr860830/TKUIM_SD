@@ -31,12 +31,13 @@ type Group struct {
 
 type userSchedule struct {
 	gorm.Model
-	UserID   uint
-	Event    string
-	Time     time.Time
-	Location string
-	Color    string
-	Note     string
+	UserID    uint
+	Event     string
+	StartTime time.Time
+	EndTime   time.Time
+	Location  string
+	Color     string
+	Note      string
 }
 
 type groupSchedule struct {
@@ -44,7 +45,8 @@ type groupSchedule struct {
 	GroupID   uint
 	SponsorID uint
 	Event     string
-	Time      time.Time
+	StartTime time.Time
+	EndTime   time.Time
 	Location  string
 	Color     string
 	Note      string

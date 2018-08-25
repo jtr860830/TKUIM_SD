@@ -3,6 +3,7 @@ package main // import "github.com/jtr860830/SD-Backend"
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -369,12 +370,13 @@ func addScheduleHdlr(c *gin.Context) {
 	username := session.Get("user").(string)
 
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
+	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
+	endTime, _ := time.Parse(time.RFC3339, c.PostForm("end"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
 
-	if strings.Trim(event, " ") == "" || strings.Trim(eventTime.String(), " ") == "" {
+	if strings.Trim(event, " ") == "" || strings.Trim(startTime.String(), " ") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Event and time can't be empty"})
 		return
 	}
@@ -387,11 +389,12 @@ func addScheduleHdlr(c *gin.Context) {
 	}
 
 	if err := db.Model(&user).Association("Schedule").Append(userSchedule{
-		Event:    event,
-		Time:     eventTime,
-		Location: location,
-		Color:    color,
-		Note:     note,
+		Event:     event,
+		StartTime: startTime,
+		EndTime:   endTime,
+		Location:  location,
+		Color:     color,
+		Note:      note,
 	}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error"})
 		return
@@ -417,7 +420,8 @@ func rmScheduleHdlr(c *gin.Context) {
 	username := session.Get("user").(string)
 
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
+	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
+	endTime, _ := time.Parse(time.RFC3339, c.PostForm("end"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
@@ -431,12 +435,13 @@ func rmScheduleHdlr(c *gin.Context) {
 	}
 
 	if err := db.Where(&userSchedule{
-		UserID:   user.ID,
-		Event:    event,
-		Time:     eventTime,
-		Location: location,
-		Color:    color,
-		Note:     note,
+		UserID:    user.ID,
+		Event:     event,
+		StartTime: startTime,
+		EndTime:   endTime,
+		Location:  location,
+		Color:     color,
+		Note:      note,
 	}).First(&schedule).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "You don't have this schedule"})
 		return
@@ -484,10 +489,12 @@ func addBackupHdlr(c *gin.Context) {
 	session := sessions.Default(c)
 	username := session.Get("user").(string)
 
+	title := c.PostForm("title")
 	info := c.PostForm("info")
+	importance, _ := strconv.Atoi(c.PostForm("importance"))
 
-	if strings.Trim(info, " ") == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Parameters can't be empty"})
+	if strings.Trim(title, " ") == "" || strings.Trim(info, " ") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Title and content can't be empty"})
 		return
 	}
 
@@ -498,7 +505,11 @@ func addBackupHdlr(c *gin.Context) {
 		return
 	}
 
-	if err := db.Model(&user).Association("Backup").Append(backup{Info: info}).Error; err != nil {
+	if err := db.Model(&user).Association("Backup").Append(backup{
+		Title:      title,
+		Info:       info,
+		Importance: importance,
+	}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error"})
 		return
 	}
@@ -518,7 +529,9 @@ func rmBackupHdlr(c *gin.Context) {
 	session := sessions.Default(c)
 	username := session.Get("user").(string)
 
+	title := c.PostForm("title")
 	info := c.PostForm("info")
+	importance, _ := strconv.Atoi(c.PostForm("importance"))
 
 	user := User{}
 	bp := backup{}
@@ -529,8 +542,10 @@ func rmBackupHdlr(c *gin.Context) {
 	}
 
 	if err := db.Where(&backup{
-		UserID: user.ID,
-		Info:   info,
+		UserID:     user.ID,
+		Title:      title,
+		Info:       info,
+		Importance: importance,
 	}).First(&bp).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "You don't have this backup"})
 		return
@@ -722,12 +737,13 @@ func addGroupScheduleHdlr(c *gin.Context) {
 
 	name := c.PostForm("name")
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
+	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
+	endTime, _ := time.Parse(time.RFC3339, c.PostForm("end"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
 
-	if strings.Trim(event, " ") == "" || strings.Trim(eventTime.String(), " ") == "" {
+	if strings.Trim(event, " ") == "" || strings.Trim(startTime.String(), " ") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Event and time can't be empty"})
 		return
 	}
@@ -748,7 +764,8 @@ func addGroupScheduleHdlr(c *gin.Context) {
 	if err := db.Model(&group).Association("Schedule").Append(groupSchedule{
 		SponsorID: user.ID,
 		Event:     event,
-		Time:      eventTime,
+		StartTime: startTime,
+		EndTime:   endTime,
 		Location:  location,
 		Color:     color,
 		Note:      note,
@@ -774,7 +791,8 @@ func rmGroupScheduleHdlr(c *gin.Context) {
 
 	name := c.PostForm("name")
 	event := c.PostForm("event")
-	eventTime, _ := time.Parse(time.RFC3339, c.PostForm("time"))
+	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
+	endTime, _ := time.Parse(time.RFC3339, c.PostForm("end"))
 	location := c.PostForm("location")
 	color := c.PostForm("color")
 	note := c.PostForm("note")
@@ -796,7 +814,8 @@ func rmGroupScheduleHdlr(c *gin.Context) {
 	if err := db.Where(&groupSchedule{
 		SponsorID: user.ID,
 		Event:     event,
-		Time:      eventTime,
+		StartTime: startTime,
+		EndTime:   endTime,
 		Location:  location,
 		Color:     color,
 		Note:      note,
