@@ -3,11 +3,10 @@ pipeline:
   build:
     image: golang
     commands:
-      - go get -u golang.org/x/vgo
       - export CC=gcc
-      - vgo env
-      - vgo build
-      - vgo test
+      - go env
+      - go build
+      - go test
 
   notify:
     image: plugins/slack
