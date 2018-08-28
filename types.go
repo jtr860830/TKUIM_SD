@@ -1,8 +1,9 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 // User data model
@@ -58,4 +59,14 @@ type backup struct {
 	Title      string
 	Info       string
 	Importance int
+}
+
+type login struct {
+	Username string `form:"username" json:"username" binding:"required"`
+	Password string `form:"password" json:"password" binding:"required"`
+}
+
+type payload struct {
+	UserID   uint
+	Username string
 }

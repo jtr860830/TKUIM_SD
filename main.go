@@ -13,16 +13,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-type login struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
-}
-
-type payload struct {
-	UserID   uint
-	Username string
-}
-
 func main() {
 
 	initDB()
