@@ -21,7 +21,10 @@ func main() {
 	route := gin.Default()
 
 	store := cookie.NewStore([]byte("secret-string"))
-	route.Use(sessions.Sessions("session", store))
+	store.Options(sessions.Options{
+		MaxAge: 1000 * 60 * 60,
+	})
+	route.Use(sessions.Sessions("token", store))
 
 	route.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Home Page")
