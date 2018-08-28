@@ -7,12 +7,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
+
+type login struct {
+	Username string `form:"username" json:"username" binding:"required"`
+	Password string `form:"password" json:"password" binding:"required"`
+}
+
+type payload struct {
+	UserID   uint
+	Username string
+}
 
 func main() {
 
@@ -20,21 +29,71 @@ func main() {
 
 	route := gin.Default()
 
-	store := cookie.NewStore([]byte("secret-string"))
-	store.Options(sessions.Options{
-		MaxAge: 1000 * 60 * 60,
-	})
-	route.Use(sessions.Sessions("token", store))
+	authMiddleware := &jwt.GinJWTMiddleware{
+		Realm:      "test zone",
+		Key:        []byte("secret-key"),
+		Timeout:    time.Hour,
+		MaxRefresh: time.Hour,
+		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			if v, ok := data.(*payload); ok {
+				return jwt.MapClaims{
+					"id":       v.UserID,
+					"username": v.Username,
+				}
+			}
+			return jwt.MapClaims{}
+		},
+		Authenticator: func(c *gin.Context) (interface{}, error) {
+			var loginVals login
+			if err := c.Bind(&loginVals); err != nil {
+				return "", jwt.ErrMissingLoginValues
+			}
+			username := loginVals.Username
+			password := loginVals.Password
 
-	route.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Home Page")
+			db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+			if err != nil {
+				log.Println(err)
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+				return nil, jwt.ErrFailedAuthentication
+			}
+			defer db.Close()
+
+			user := User{}
+			if err := db.Where(&User{Username: username}).Find(&user).Error; err != nil {
+				return nil, jwt.ErrFailedAuthentication
+			}
+			if user.Password != password {
+				return nil, jwt.ErrFailedAuthentication
+			}
+
+			return &payload{
+				UserID:   user.ID,
+				Username: user.Username,
+			}, nil
+		},
+		Unauthorized: func(c *gin.Context, code int, message string) {
+			c.JSON(code, gin.H{
+				"code":    code,
+				"message": message,
+			})
+		},
+
+		TokenLookup: "header: Authorization, query: token, cookie: jwt",
+		TimeFunc:    time.Now,
+	}
+
+	route.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		log.Printf("NoRoute claims: %#v\n", claims)
+		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 	})
 
-	route.POST("/login", loginHdlr)
+	route.POST("/login", authMiddleware.LoginHandler)
 	route.GET("/logout", logoutHdlr)
 	route.POST("/register", registerHdlr)
 
-	account := route.Group("/user", auth())
+	account := route.Group("/user", authMiddleware.MiddlewareFunc())
 	{
 		account.GET("/", func(c *gin.Context) {
 			c.Redirect(http.StatusMovedPermanently, "/user/profile")
@@ -91,67 +150,8 @@ func initDB() {
 	}
 }
 
-func auth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		user := session.Get("user")
-		if user == nil {
-			c.String(http.StatusNotAcceptable, "You should not pass!")
-			log.Println("A strangers attempted to log in!")
-			c.Abort()
-		} else {
-			c.Next()
-		}
-	}
-}
-
-func loginHdlr(c *gin.Context) {
-	session := sessions.Default(c)
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-
-	if strings.Trim(username, " ") == "" || strings.Trim(password, " ") == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Parameters can't be empty"})
-		return
-	}
-
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
-	user := User{}
-	if err := db.Where(&User{Username: username}).Find(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid username or password"})
-		return
-	}
-	if user.Password != password {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid username or password"})
-		return
-	}
-
-	session.Set("user", username)
-	err = session.Save()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate session token"})
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
-}
-
 func logoutHdlr(c *gin.Context) {
-	session := sessions.Default(c)
-	user := session.Get("user")
 
-	if user == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid session token"})
-	}
-
-	session.Delete("user")
-	session.Save()
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 }
 
 func registerHdlr(c *gin.Context) {
@@ -197,8 +197,8 @@ func profileHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	user := User{}
 	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
@@ -218,8 +218,8 @@ func chpasswdHdlr(c *gin.Context) {
 	}
 	db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	opasswd := c.PostForm("orpassword")
 	cpasswd := c.PostForm("chpassword")
@@ -253,8 +253,8 @@ func getFriendHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	user := User{}
 	if err := db.Where(&User{Username: username}).Preload("Friend").First(&user).Error; err != nil {
@@ -279,8 +279,8 @@ func addFriendHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 	friendname := c.PostForm("username")
 
 	user := User{}
@@ -313,8 +313,8 @@ func rmFriendHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 	friendname := c.PostForm("username")
 
 	user := User{}
@@ -347,8 +347,8 @@ func getScheduleHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	user := User{}
 
@@ -369,8 +369,8 @@ func addScheduleHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	event := c.PostForm("event")
 	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
@@ -419,8 +419,8 @@ func rmScheduleHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	event := c.PostForm("event")
 	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
@@ -467,8 +467,8 @@ func getBackupHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	user := User{}
 
@@ -489,8 +489,8 @@ func addBackupHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	title := c.PostForm("title")
 	info := c.PostForm("info")
@@ -529,8 +529,8 @@ func rmBackupHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	title := c.PostForm("title")
 	info := c.PostForm("info")
@@ -570,8 +570,8 @@ func getGroupHdlr(c *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	user := User{}
 
@@ -592,8 +592,8 @@ func createGroupHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	name := c.PostForm("name")
 	color := c.PostForm("color")
@@ -735,8 +735,8 @@ func addGroupScheduleHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	name := c.PostForm("name")
 	event := c.PostForm("event")
@@ -789,8 +789,8 @@ func rmGroupScheduleHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	session := sessions.Default(c)
-	username := session.Get("user").(string)
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
 
 	name := c.PostForm("name")
 	event := c.PostForm("event")
