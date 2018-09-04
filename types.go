@@ -70,3 +70,10 @@ type payload struct {
 	UserID   uint
 	Username string
 }
+
+type cdItem struct {
+	BelongsTo string
+	Event     string
+	StartTime time.Time
+	CD        time.Time
+}

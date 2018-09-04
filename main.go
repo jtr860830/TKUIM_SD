@@ -7,6 +7,7 @@ import (
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -16,6 +17,8 @@ func main() {
 	initDB()
 
 	route := gin.Default()
+
+	route.Use(cors.Default())
 
 	authMiddleware := &jwt.GinJWTMiddleware{
 		Realm:      "test zone",
@@ -88,8 +91,9 @@ func main() {
 		})
 
 		account.GET("/profile", profileHdlr)
-
 		account.POST("/chpasswd", chpasswdHdlr)
+		
+		account.GET("/countdown", cdHdlr)
 
 		account.GET("/friends", getFriendHdlr)
 		account.POST("/friends", addFriendHdlr)
