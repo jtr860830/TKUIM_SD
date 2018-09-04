@@ -1,7 +1,7 @@
 module github.com/jtr860830/SD-Backend
 
 require (
-	cloud.google.com/go v0.26.0 // indirect
+	cloud.google.com/go v0.27.0 // indirect
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
 	github.com/appleboy/gofight v2.0.0+incompatible // indirect
 	github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44 // indirect

@@ -75,5 +75,5 @@ type cdItem struct {
 	BelongsTo string
 	Event     string
 	StartTime time.Time
-	CD        time.Time
+	CD        int
 }

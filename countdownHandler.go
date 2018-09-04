@@ -3,6 +3,8 @@ package main // import "github.com/jtr860830/SD-Backend"
 import (
 	"log"
 	"net/http"
+	"sort"
+	"time"
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
@@ -29,7 +31,38 @@ func cdHdlr(c *gin.Context) {
 		return
 	}
 
-	//lower := time.Now()
-	//upper := lower.Add(time.Hour * 24 * 7)
+	lower := time.Now()
+	upper := lower.Add(time.Hour * 24 * 7)
 
+	cd := []cdItem{}
+
+	for _, v := range user.Schedule {
+		if t := v.StartTime; lower.After(t) && upper.Before(t) {
+			cd = append(cd, cdItem{
+				BelongsTo: "Personal",
+				Event:     v.Event,
+				StartTime: t,
+				CD:        int(t.Sub(lower).Hours()) / 24,
+			})
+		}
+	}
+
+	for _, g := range user.Groups {
+		for _, v := range (*g).Schedule {
+			if t := v.StartTime; lower.After(t) && upper.Before(t) {
+				cd = append(cd, cdItem{
+					BelongsTo: (*g).Name,
+					Event:     v.Event,
+					StartTime: t,
+					CD:        int(t.Sub(lower).Hours()) / 24,
+				})
+			}
+		}
+	}
+
+	sort.Slice(cd, func(i, j int) bool {
+		return cd[i].CD < cd[j].CD
+	})
+
+	c.JSON(http.StatusOK, cd)
 }
