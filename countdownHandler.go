@@ -37,7 +37,7 @@ func cdHdlr(c *gin.Context) {
 	cd := []cdItem{}
 
 	for _, v := range user.Schedule {
-		if t := v.StartTime; lower.After(t) && upper.Before(t) {
+		if t := v.StartTime; lower.Before(t) && upper.After(t) {
 			cd = append(cd, cdItem{
 				BelongsTo: "Personal",
 				Event:     v.Event,
@@ -49,7 +49,7 @@ func cdHdlr(c *gin.Context) {
 
 	for _, g := range user.Groups {
 		for _, v := range (*g).Schedule {
-			if t := v.StartTime; lower.After(t) && upper.Before(t) {
+			if t := v.StartTime; lower.Before(t) && upper.After(t) {
 				cd = append(cd, cdItem{
 					BelongsTo: (*g).Name,
 					Event:     v.Event,
