@@ -91,6 +91,7 @@ func main() {
 		})
 
 		account.GET("/profile", profileHdlr)
+		account.PATCH("/profile", udProfileHdlr)
 		account.POST("/chpasswd", chpasswdHdlr)
 		
 		account.GET("/countdown", cdHdlr)

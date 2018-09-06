@@ -66,6 +66,35 @@ func profileHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+func udProfileHdlr(c *gin.Context) {
+	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	defer db.Close()
+
+	claims := jwt.ExtractClaims(c)
+	username := claims["username"].(string)
+
+	user := User{}
+	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
+		return
+	}
+
+	email := c.PostForm("email")
+	birthday, _ := time.Parse(time.RFC3339, c.PostForm("birthday"))
+
+	if err := db.Model(&user).Updates(User{Email: email, Birthday: birthday}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
 func chpasswdHdlr(c *gin.Context) {
 	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
