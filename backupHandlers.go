@@ -3,6 +3,7 @@ package main // import "github.com/jtr860830/SD-Backend"
 import (
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -24,13 +25,19 @@ func getBackupHdlr(c *gin.Context) {
 	username := claims["username"].(string)
 
 	user := User{}
+	bpData := []backup{}
 
 	if err := db.Where(&User{Username: username}).Preload("Backup").First(&user).Error; err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, user.Backup)
+	bpData = user.Backup
+	sort.Slice(bpData, func(i, j int) bool {
+		return bpData[i].Importance > bpData[j].Importance
+	})
+
+	c.JSON(http.StatusOK, bpData)
 }
 
 func addBackupHdlr(c *gin.Context) {
