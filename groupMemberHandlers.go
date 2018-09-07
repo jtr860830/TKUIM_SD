@@ -17,7 +17,7 @@ func getMemberHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	name := c.PostForm("name")
+	name := c.Query("name")
 
 	group := Group{}
 
