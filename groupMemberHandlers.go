@@ -19,6 +19,11 @@ func getMemberHdlr(c *gin.Context) {
 
 	name := c.Query("name")
 
+	if name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Querystring name can't be empty"})
+		return
+	}
+
 	group := Group{}
 
 	if err := db.Where(&Group{Name: name}).Preload("Users").First(&group).Error; err != nil {
