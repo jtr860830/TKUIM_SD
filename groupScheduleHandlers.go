@@ -20,7 +20,12 @@ func getGroupScheduleHdlr(c *gin.Context) {
 	}
 	defer db.Close()
 
-	name := c.PostForm("name")
+	name := c.Query("name")
+
+	if name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Querystring name can't be empty"})
+		return
+	}
 
 	group := Group{}
 

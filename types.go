@@ -77,3 +77,8 @@ type cdItem struct {
 	StartTime time.Time
 	CD        int
 }
+
+type anlData struct {
+	Username string
+	Cnt      int
+}
