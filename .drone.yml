@@ -1,7 +1,7 @@
 pipeline:
 
   build:
-    image: golang:latest
+    image: golang:1.11
     commands:
       - export CC=gcc
       - go env
