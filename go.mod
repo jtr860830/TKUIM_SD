@@ -34,12 +34,12 @@ require (
 	github.com/tidwall/gjson v1.1.3 // indirect
 	github.com/tidwall/match v0.0.0-20171002075945-1731857f09b1 // indirect
 	github.com/ugorji/go v1.1.1 // indirect
-	github.com/valyala/bytebufferpool v0.0.0-20160817181652-e746df99fe4a // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
 	golang.org/x/crypto v0.0.0-20180904163835-0709b304e793 // indirect
-	golang.org/x/net v0.0.0-20180826012351-8a410e7b638d // indirect
+	golang.org/x/net v0.0.0-20180906233101-161cd47e91fd // indirect
 	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f // indirect
-	golang.org/x/sys v0.0.0-20180903190138-2b024373dcd9 // indirect
+	golang.org/x/sys v0.0.0-20180907202204-917fdcba135d // indirect
 	google.golang.org/appengine v1.1.0 // indirect
 	gopkg.in/appleboy/gofight.v2 v2.0.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
