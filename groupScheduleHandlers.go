@@ -3,6 +3,7 @@ package main // import "github.com/jtr860830/SD-Backend"
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -29,7 +30,7 @@ func getGroupScheduleHdlr(c *gin.Context) {
 
 	group := Group{}
 
-	if err := db.Where(&Group{Name: name}).Preload("Schedule").First(&group).Error; err != nil {
+	if err := db.Set("gorm:auto_preload", true).Where(&Group{Name: name}).First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
@@ -53,9 +54,11 @@ func addGroupScheduleHdlr(c *gin.Context) {
 	event := c.PostForm("event")
 	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
 	endTime, _ := time.Parse(time.RFC3339, c.PostForm("end"))
-	location := c.PostForm("location")
+	lc := c.PostForm("location")
+	n, _ := strconv.ParseFloat(c.PostForm("n"), 64)
+	e, _ := strconv.ParseFloat(c.PostForm("e"), 64)
 	color := c.PostForm("color")
-	note := c.PostForm("note")
+	t := c.PostForm("type")
 
 	if strings.Trim(event, " ") == "" || strings.Trim(startTime.String(), " ") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Event and time can't be empty"})
@@ -80,9 +83,13 @@ func addGroupScheduleHdlr(c *gin.Context) {
 		Event:     event,
 		StartTime: startTime,
 		EndTime:   endTime,
-		Location:  location,
-		Color:     color,
-		Note:      note,
+		Location: location{
+			Name: lc,
+			E:    e,
+			N:    n,
+		},
+		Color: color,
+		Type:  t,
 	}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error"})
 		return
@@ -107,9 +114,9 @@ func rmGroupScheduleHdlr(c *gin.Context) {
 	event := c.PostForm("event")
 	startTime, _ := time.Parse(time.RFC3339, c.PostForm("start"))
 	endTime, _ := time.Parse(time.RFC3339, c.PostForm("end"))
-	location := c.PostForm("location")
+	//location := c.PostForm("location")
 	color := c.PostForm("color")
-	note := c.PostForm("note")
+	t := c.PostForm("type")
 
 	user := User{}
 	group := Group{}
@@ -130,9 +137,8 @@ func rmGroupScheduleHdlr(c *gin.Context) {
 		Event:     event,
 		StartTime: startTime,
 		EndTime:   endTime,
-		Location:  location,
 		Color:     color,
-		Note:      note,
+		Type:      t,
 	}).First(&schedule).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "You don't have this schedule"})
 		return

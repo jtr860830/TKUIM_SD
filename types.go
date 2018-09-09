@@ -32,25 +32,27 @@ type Group struct {
 
 type userSchedule struct {
 	gorm.Model
-	UserID    uint
-	Event     string
-	StartTime time.Time
-	EndTime   time.Time
-	Location  string
-	Color     string
-	Note      string
+	UserID     uint
+	Event      string
+	StartTime  time.Time
+	EndTime    time.Time
+	Location   location
+	LocationID uint
+	Color      string
+	Type       string
 }
 
 type groupSchedule struct {
 	gorm.Model
-	GroupID   uint
-	SponsorID uint
-	Event     string
-	StartTime time.Time
-	EndTime   time.Time
-	Location  string
-	Color     string
-	Note      string
+	GroupID    uint
+	SponsorID  uint
+	Event      string
+	StartTime  time.Time
+	EndTime    time.Time
+	Location   location
+	LocationID uint
+	Color      string
+	Type       string
 }
 
 type backup struct {
@@ -59,6 +61,13 @@ type backup struct {
 	Title      string
 	Info       string
 	Importance int
+}
+
+type location struct {
+	gorm.Model
+	Name string
+	E    float64
+	N    float64
 }
 
 type login struct {
