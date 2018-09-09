@@ -120,6 +120,7 @@ func main() {
 
 			group.GET("/schedules", getGroupScheduleHdlr)
 			group.POST("/schedules", addGroupScheduleHdlr)
+			group.POST("/schedules/all", addAllGroupScheduleHdlr)
 			group.DELETE("/schedules", rmGroupScheduleHdlr)
 
 			group.GET("/analysis", getGroupAnalysisHdlr)
