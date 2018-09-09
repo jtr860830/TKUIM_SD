@@ -141,6 +141,6 @@ func initDB() {
 		db.AutoMigrate(&User{}, &Group{}, &userSchedule{}, &groupSchedule{}, &backup{}, &location{})
 		db.Model(&userSchedule{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 		db.Model(&backup{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
-		db.Model(&groupSchedule{}).AddForeignKey("group_id", "users(id)", "RESTRICT", "RESTRICT")
+		db.Model(&groupSchedule{}).AddForeignKey("group_id", "groups(id)", "RESTRICT", "RESTRICT")
 	}
 }
