@@ -47,7 +47,7 @@ func cdHdlr(c *gin.Context) {
 		}
 	}
 
-    db.Preload("Schedule").Find(&user.Groups)
+  db.Preload("Schedule").Find(&user.Groups)
 
 	for _, g := range user.Groups {
 		for _, v := range (*g).Schedule {

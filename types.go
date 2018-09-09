@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Data models
 // User data model
 type User struct {
 	gorm.Model
@@ -70,6 +71,7 @@ type location struct {
 	N    float64
 }
 
+// Data structs
 type login struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
@@ -87,7 +89,21 @@ type cdItem struct {
 	CD        int
 }
 
-type anlData struct {
+type gpAnlData struct {
 	Username string
 	Cnt      int
+}
+
+type gpAnl2Data struct {
+	Cnt int
+}
+
+type usrAnlData struct {
+	Groupname string
+	Cnt       int
+}
+
+type usrAnl2Data struct {
+	Groupname string
+	Cnt       float64
 }
