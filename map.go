@@ -27,7 +27,7 @@ func anlMap(c *gin.Context) {
 
 	if name == "" {
 		user := User{}
-		if err := db.Where(&User{Username: username}).Preload("Schedule").First(&user).Error; err != nil {
+		if err := db.Set("gorm:auto_preload", true).Where(&User{Username: username}).First(&user).Error; err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
 			return
 		}
@@ -42,7 +42,7 @@ func anlMap(c *gin.Context) {
 		}
 	} else {
 		group := Group{}
-		if err := db.Where(&Group{Name: name}).Preload("Schedule").First(&group).Error; err != nil {
+		if err := db.Set("gorm:auto_preload", true).Where(&Group{Name: name}).First(&group).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 			return
 		}
