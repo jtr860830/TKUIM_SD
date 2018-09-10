@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/appleboy/gin-jwt"
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -93,9 +93,11 @@ func main() {
 		account.GET("/profile", profileHdlr)
 		account.PATCH("/profile", udProfileHdlr)
 		account.POST("/chpasswd", chpasswdHdlr)
-		
+
 		account.GET("/countdown", cdHdlr)
-		
+
+		account.GET("/map", anlMap)
+
 		account.GET("/analysis/1", getUserAnalysisHdlr)
 		account.GET("/analysis/2", getUserAnalysis2Hdlr)
 
