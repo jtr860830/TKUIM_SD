@@ -97,7 +97,7 @@ func main() {
 		account.GET("/countdown", cdHdlr)
 		
 		account.GET("/analysis/1", getUserAnalysisHdlr)
-		account.GET("/analysis/2", getGroupAnalysis2Hdlr)
+		account.GET("/analysis/2", getUserAnalysis2Hdlr)
 
 		account.GET("/friends", getFriendHdlr)
 		account.POST("/friends", addFriendHdlr)

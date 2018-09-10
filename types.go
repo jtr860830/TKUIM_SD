@@ -107,3 +107,10 @@ type usrAnl2Data struct {
 	Groupname string
 	Cnt       float64
 }
+
+type mapData struct {
+	Event string
+	Type  string
+	E     float64
+	N     float64
+}
