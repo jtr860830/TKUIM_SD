@@ -95,6 +95,9 @@ func main() {
 		account.POST("/chpasswd", chpasswdHdlr)
 		
 		account.GET("/countdown", cdHdlr)
+		
+		account.GET("/analysis/1", getUserAnalysisHdlr)
+		account.GET("/analysis/2", getGroupAnalysis2Hdlr)
 
 		account.GET("/friends", getFriendHdlr)
 		account.POST("/friends", addFriendHdlr)
@@ -123,7 +126,8 @@ func main() {
 			group.POST("/schedules/all", addAllGroupScheduleHdlr)
 			group.DELETE("/schedules", rmGroupScheduleHdlr)
 
-			group.GET("/analysis", getGroupAnalysisHdlr)
+			group.GET("/analysis/1", getGroupAnalysisHdlr)
+			group.GET("/analysis/2", getGroupAnalysis2Hdlr)
 		}
 	}
 
