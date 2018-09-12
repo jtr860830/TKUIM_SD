@@ -58,9 +58,8 @@ func getUserAnalysis2Hdlr(c *gin.Context) {
 
 	data := []usrAnl2Data{}
 
-	db.Preload("Schedule").Find(&user.Groups)
-
 	for k, g := range user.Groups {
+		db.Model(g).Related(&(*g).Schedule)
 		data = append(data, usrAnl2Data{Groupname: (*g).Name, Cnt: 0})
 		for _, v := range (*g).Schedule {
 			data[k].Cnt += v.EndTime.Sub(v.StartTime).Seconds()
