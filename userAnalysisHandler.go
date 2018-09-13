@@ -3,6 +3,7 @@ package main // import "github.com/jtr860830/SD-Backend"
 import (
 	"log"
 	"net/http"
+	"sort"
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
@@ -65,6 +66,10 @@ func getUserAnalysis2Hdlr(c *gin.Context) {
 			data[k].Cnt += v.EndTime.Sub(v.StartTime).Seconds()
 		}
 	}
+
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].Cnt > data[j].Cnt
+	})
 
 	c.JSON(http.StatusOK, data)
 }

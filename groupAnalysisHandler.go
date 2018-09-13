@@ -3,6 +3,7 @@ package main // import "github.com/jtr860830/SD-Backend"
 import (
 	"log"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,10 @@ func getGroupAnalysisHdlr(c *gin.Context) {
 			}
 		}
 	}
+
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].Cnt > data[j].Cnt
+	})
 
 	c.JSON(http.StatusOK, data)
 }
