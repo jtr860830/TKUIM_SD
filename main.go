@@ -145,7 +145,7 @@ func initDB() {
 	defer db.Close()
 
 	if !db.HasTable(&User{}) {
-		db.AutoMigrate(&User{}, &Group{}, &userSchedule{}, &groupSchedule{}, &backup{}, &location{})
+		db.Set("gorm:table_options", "charset=utf8").AutoMigrate(&User{}, &Group{}, &userSchedule{}, &groupSchedule{}, &backup{}, &location{})
 		db.Model(&userSchedule{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 		db.Model(&backup{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 		db.Model(&groupSchedule{}).AddForeignKey("group_id", "groups(id)", "RESTRICT", "RESTRICT")
