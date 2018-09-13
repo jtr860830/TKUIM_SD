@@ -97,6 +97,9 @@ func main() {
 		account.GET("/countdown", cdHdlr)
 
 		account.GET("/map", anlMap)
+		account.GET("/map/weeks", anlMapTimeWeek)
+		account.GET("/map/months", anlMapTimeMonth)
+		account.GET("/map/years", anlMapTimeYear)
 
 		account.GET("/analysis/1", getUserAnalysisHdlr)
 		account.GET("/analysis/2", getUserAnalysis2Hdlr)
