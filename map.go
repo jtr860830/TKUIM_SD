@@ -137,7 +137,7 @@ func anlMapTimeMonth(c *gin.Context) {
 	username := claims["username"].(string)
 
 	upper := time.Now()
-	lower := upper.AddDate(0, size, 0)
+	lower := upper.AddDate(0, -size, 0)
 
 	data := []mapData{}
 
@@ -196,7 +196,7 @@ func anlMapTimeYear(c *gin.Context) {
 	username := claims["username"].(string)
 
 	upper := time.Now()
-	lower := upper.AddDate(size, 0, 0)
+	lower := upper.AddDate(-size, 0, 0)
 
 	data := []mapData{}
 
