@@ -9,7 +9,7 @@ import (
 )
 
 func getMemberHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -35,7 +35,7 @@ func getMemberHdlr(c *gin.Context) {
 }
 
 func addMemberHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -68,7 +68,7 @@ func addMemberHdlr(c *gin.Context) {
 }
 
 func rmMemberHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})

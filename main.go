@@ -3,6 +3,7 @@ package main // import "github.com/jtr860830/SD-Backend"
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/appleboy/gin-jwt"
@@ -12,8 +13,10 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// DBLoc Database location
-const DBLoc string = "root:password@tcp(database:3306)/sd?charset=utf8&parseTime=True&loc=Local"
+// DBLC Database location
+var DBLC = os.Getenv("DBLC")
+// DBMS type of database management system
+var DBMS = os.Getenv("DBMS")
 
 func main() {
 
@@ -45,7 +48,7 @@ func main() {
 			username := loginVals.Username
 			password := loginVals.Password
 
-			db, err := gorm.Open("mysql", DBLoc)
+			db, err := gorm.Open(DBMS, DBLC)
 			if err != nil {
 				log.Println(err)
 				c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -143,11 +146,19 @@ func main() {
 }
 
 func initDB() {
-	db, err := gorm.Open("mysql", DBLoc)
+	if DBLC == "" {
+		DBLC = "root:password@/sd?charset=utf8&parseTime=True&loc=Local"
+	}
+
+	if DBMS == "" {
+		DBMS = "mysql"
+	}
+
+	db, err := gorm.Open(DBMS, DBLC)
 	for err != nil {
 		log.Println(err)
 		time.Sleep(time.Duration(5) * time.Second)
-		db, err = gorm.Open("mysql", DBLoc)
+		db, err = gorm.Open(DBMS, DBLC)
 	}
 	defer db.Close()
 

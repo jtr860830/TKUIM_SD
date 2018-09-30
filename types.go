@@ -6,7 +6,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// Data models
 // User data model
 type User struct {
 	gorm.Model

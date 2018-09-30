@@ -11,7 +11,7 @@ import (
 )
 
 func getGroupAnalysisHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -52,7 +52,7 @@ func getGroupAnalysisHdlr(c *gin.Context) {
 }
 
 func getGroupAnalysis2Hdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})

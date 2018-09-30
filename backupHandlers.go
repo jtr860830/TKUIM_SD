@@ -13,7 +13,7 @@ import (
 )
 
 func getBackupHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -41,7 +41,7 @@ func getBackupHdlr(c *gin.Context) {
 }
 
 func addBackupHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -81,7 +81,7 @@ func addBackupHdlr(c *gin.Context) {
 }
 
 func rmBackupHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})

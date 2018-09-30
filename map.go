@@ -12,7 +12,7 @@ import (
 )
 
 func anlMap(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -63,7 +63,7 @@ func anlMap(c *gin.Context) {
 }
 
 func anlMapTimeWeek(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -122,7 +122,7 @@ func anlMapTimeWeek(c *gin.Context) {
 }
 
 func anlMapTimeMonth(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -181,7 +181,7 @@ func anlMapTimeMonth(c *gin.Context) {
 }
 
 func anlMapTimeYear(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})

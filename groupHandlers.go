@@ -10,7 +10,7 @@ import (
 )
 
 func getGroupHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -31,7 +31,7 @@ func getGroupHdlr(c *gin.Context) {
 }
 
 func createGroupHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", DBLoc)
+	db, err := gorm.Open(DBMS, DBLC)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
