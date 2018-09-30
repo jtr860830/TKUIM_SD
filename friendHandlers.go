@@ -10,7 +10,7 @@ import (
 )
 
 func getFriendHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -36,7 +36,7 @@ func getFriendHdlr(c *gin.Context) {
 }
 
 func addFriendHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -70,7 +70,7 @@ func addFriendHdlr(c *gin.Context) {
 }
 
 func rmFriendHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})

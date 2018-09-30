@@ -12,6 +12,9 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+// DBLoc Database location
+const DBLoc string = "root:password@tcp(database:3306)/sd?charset=utf8&parseTime=True&loc=Local"
+
 func main() {
 
 	initDB()
@@ -42,7 +45,7 @@ func main() {
 			username := loginVals.Username
 			password := loginVals.Password
 
-			db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+			db, err := gorm.Open("mysql", DBLoc)
 			if err != nil {
 				log.Println(err)
 				c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -140,7 +143,7 @@ func main() {
 }
 
 func initDB() {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		return

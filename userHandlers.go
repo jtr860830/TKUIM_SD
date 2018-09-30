@@ -12,7 +12,7 @@ import (
 )
 
 func registerHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -46,7 +46,7 @@ func registerHdlr(c *gin.Context) {
 }
 
 func profileHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -67,7 +67,7 @@ func profileHdlr(c *gin.Context) {
 }
 
 func udProfileHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -96,7 +96,7 @@ func udProfileHdlr(c *gin.Context) {
 }
 
 func chpasswdHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})

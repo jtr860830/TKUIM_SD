@@ -13,7 +13,7 @@ import (
 )
 
 func getScheduleHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -35,7 +35,7 @@ func getScheduleHdlr(c *gin.Context) {
 }
 
 func addScheduleHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -91,7 +91,7 @@ func udScheduleHdlr(c *gin.Context) {
 }
 
 func rmScheduleHdlr(c *gin.Context) {
-	db, err := gorm.Open("mysql", "root:password@/sd?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", DBLoc)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
