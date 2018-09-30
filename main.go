@@ -144,9 +144,10 @@ func main() {
 
 func initDB() {
 	db, err := gorm.Open("mysql", DBLoc)
-	if err != nil {
+	for err != nil {
 		log.Println(err)
-		return
+		time.Sleep(time.Duration(5) * time.Second)
+		db, err = gorm.Open("mysql", DBLoc)
 	}
 	defer db.Close()
 
