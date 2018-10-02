@@ -1,25 +1,15 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func registerHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	email := c.PostForm("email")
@@ -46,14 +36,6 @@ func registerHdlr(c *gin.Context) {
 }
 
 func profileHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -67,14 +49,6 @@ func profileHdlr(c *gin.Context) {
 }
 
 func udProfileHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -96,14 +70,6 @@ func udProfileHdlr(c *gin.Context) {
 }
 
 func chpasswdHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 

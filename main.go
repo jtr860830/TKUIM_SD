@@ -17,10 +17,12 @@ import (
 var DBLC = os.Getenv("DBLC")
 // DBMS type of database management system
 var DBMS = os.Getenv("DBMS")
+var db *gorm.DB
 
 func main() {
 
 	initDB()
+	defer db.Close()
 
 	route := gin.Default()
 
@@ -47,14 +49,6 @@ func main() {
 			}
 			username := loginVals.Username
 			password := loginVals.Password
-
-			db, err := gorm.Open(DBMS, DBLC)
-			if err != nil {
-				log.Println(err)
-				c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-				return nil, jwt.ErrFailedAuthentication
-			}
-			defer db.Close()
 
 			user := User{}
 			if err := db.Where(&User{Username: username}).Find(&user).Error; err != nil {
@@ -160,7 +154,6 @@ func initDB() {
 		time.Sleep(time.Duration(5) * time.Second)
 		db, err = gorm.Open(DBMS, DBLC)
 	}
-	defer db.Close()
 
 	if !db.HasTable(&User{}) {
 		db.Set("gorm:table_options", "charset=utf8").AutoMigrate(&User{}, &Group{}, &userSchedule{}, &groupSchedule{}, &backup{}, &location{})

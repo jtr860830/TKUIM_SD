@@ -1,25 +1,15 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func anlMap(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 
 	claims := jwt.ExtractClaims(c)
@@ -63,14 +53,6 @@ func anlMap(c *gin.Context) {
 }
 
 func anlMapTimeWeek(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 	size, _ := strconv.Atoi(c.Query("size"))
 
@@ -122,14 +104,6 @@ func anlMapTimeWeek(c *gin.Context) {
 }
 
 func anlMapTimeMonth(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 	size, _ := strconv.Atoi(c.Query("size"))
 
@@ -181,14 +155,6 @@ func anlMapTimeMonth(c *gin.Context) {
 }
 
 func anlMapTimeYear(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 	size, _ := strconv.Atoi(c.Query("size"))
 

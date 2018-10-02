@@ -1,24 +1,14 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 	"sort"
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func getUserAnalysisHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -39,14 +29,6 @@ func getUserAnalysisHdlr(c *gin.Context) {
 }
 
 func getUserAnalysis2Hdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 

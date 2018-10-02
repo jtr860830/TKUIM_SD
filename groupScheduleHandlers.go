@@ -1,7 +1,6 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,18 +8,9 @@ import (
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func getGroupScheduleHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 
 	if name == "" {
@@ -39,14 +29,6 @@ func getGroupScheduleHdlr(c *gin.Context) {
 }
 
 func addGroupScheduleHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -99,14 +81,6 @@ func addGroupScheduleHdlr(c *gin.Context) {
 }
 
 func addAllGroupScheduleHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -154,14 +128,6 @@ func addAllGroupScheduleHdlr(c *gin.Context) {
 }
 
 func rmGroupScheduleHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 

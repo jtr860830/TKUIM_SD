@@ -1,24 +1,14 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 	"sort"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func getGroupAnalysisHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 
 	if name == "" {
@@ -52,14 +42,6 @@ func getGroupAnalysisHdlr(c *gin.Context) {
 }
 
 func getGroupAnalysis2Hdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 
 	if name == "" {

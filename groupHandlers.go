@@ -1,22 +1,13 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func getGroupHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -31,14 +22,6 @@ func getGroupHdlr(c *gin.Context) {
 }
 
 func createGroupHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 

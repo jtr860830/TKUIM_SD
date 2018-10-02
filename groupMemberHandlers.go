@@ -1,22 +1,12 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func getMemberHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	name := c.Query("name")
 
 	if name == "" {
@@ -35,14 +25,6 @@ func getMemberHdlr(c *gin.Context) {
 }
 
 func addMemberHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	username := c.PostForm("username")
 	name := c.PostForm("name")
 
@@ -68,14 +50,6 @@ func addMemberHdlr(c *gin.Context) {
 }
 
 func rmMemberHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	username := c.PostForm("username")
 	name := c.PostForm("name")
 

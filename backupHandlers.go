@@ -1,7 +1,6 @@
 package main // import "github.com/jtr860830/SD-Backend"
 
 import (
-	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -9,18 +8,9 @@ import (
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func getBackupHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -41,14 +31,6 @@ func getBackupHdlr(c *gin.Context) {
 }
 
 func addBackupHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -81,14 +63,6 @@ func addBackupHdlr(c *gin.Context) {
 }
 
 func rmBackupHdlr(c *gin.Context) {
-	db, err := gorm.Open(DBMS, DBLC)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-		return
-	}
-	defer db.Close()
-
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
