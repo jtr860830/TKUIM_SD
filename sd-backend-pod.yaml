@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sd-backend
+  labels:
+    app: sd-backend
+spec:
+  containers:
+  - name: sd-backend
+    image: jtr860830/sd-backend
+    ports:
+    - name: sd-backend-port
+      containerPort: 8080
+    env:
+    - name: DBLC
+      value: root:password@tcp(sd-database-service)/sd?charset=utf8&parseTime=True&loc=Local
+    - name: DBMS
+      value: mysql
