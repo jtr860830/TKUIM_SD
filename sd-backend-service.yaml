@@ -9,4 +9,4 @@ spec:
     targetPort: sd-backend-port
   selector:
     app: sd-backend
-  type: NodePort
+  type: LoadBalancer
