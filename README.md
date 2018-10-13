@@ -8,6 +8,7 @@ This project is for TKUIMSD. LifePrint's backend service.
 
 ## Built With
 - [gin-gonic/gin](https://github.com/gin-gonic/gin)
+- [jinzhu/gorm](https://github.com/jinzhu/gorm)
 
 ## Credits
 Thanks for my group member's help.
