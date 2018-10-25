@@ -1,8 +1,8 @@
-FROM golang:1.11
+FROM golang
 LABEL maintainer="Jezrien Hsieh"
 
 WORKDIR /app
-ADD . /app
+ADD ./app /app
 
 RUN go build
 EXPOSE 8080
