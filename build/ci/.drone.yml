@@ -3,7 +3,6 @@ pipeline:
   build:
     image: golang
     commands:
-      - cd app
       - export CC=gcc
       - go env
       - go build

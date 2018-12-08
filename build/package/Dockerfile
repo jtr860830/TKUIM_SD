@@ -2,7 +2,7 @@ FROM golang
 LABEL maintainer="Jezrien Hsieh"
 
 WORKDIR /app
-ADD ./app /app
+ADD ../.. /app
 
 RUN go build
 EXPOSE 8080

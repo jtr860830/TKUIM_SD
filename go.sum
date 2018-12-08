@@ -40,6 +40,7 @@ github.com/jinzhu/now v0.0.0-20180511015916-ed742868f2ae h1:8bBMcboXYVuo0WYH+rPe
 github.com/jinzhu/now v0.0.0-20180511015916-ed742868f2ae/go.mod h1:oHTiXerJ20+SfYcrdlBO7rzZRJWGwSTQ0iUY2jI6Gfc=
 github.com/json-iterator/go v1.1.5 h1:gL2yXlmiIo4+t+y32d4WGwOjKGYcGOuyrg46vadswDE=
 github.com/json-iterator/go v1.1.5/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
+github.com/jtr860830/SD-Backend v0.0.0-20181025092313-515bf7add6cd h1:0tEHfVXB1cv5gxVxS2nt0rtQiviYNEIsyH+QiI03YME=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=

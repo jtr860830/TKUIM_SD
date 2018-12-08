@@ -1,19 +1,22 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
 
-	"github.com/appleboy/gin-jwt"
+	"github.com/jtr860830/LifePrint-Server/database"
+
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 )
 
-func getGroupHdlr(c *gin.Context) {
+func GetGroupHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Where(&User{Username: username}).Preload("Groups").First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).Preload("Groups").First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not Found"})
 		return
 	}
@@ -21,7 +24,8 @@ func getGroupHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Groups)
 }
 
-func createGroupHdlr(c *gin.Context) {
+func CreateGroupHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -29,14 +33,14 @@ func createGroupHdlr(c *gin.Context) {
 	color := c.PostForm("color")
 	sticker := c.PostForm("sticker")
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Model(&user).Association("Groups").Append(Group{
+	if err := db.Model(&user).Association("Groups").Append(database.Group{
 		Name:    name,
 		Color:   color,
 		Sticker: sticker,

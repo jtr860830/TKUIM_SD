@@ -1,15 +1,18 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/appleboy/gin-jwt"
+	"github.com/jtr860830/LifePrint-Server/database"
+
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 )
 
-func registerHdlr(c *gin.Context) {
+func RegisterHdlr(c *gin.Context) {
+	db := database.GetDB()
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	email := c.PostForm("email")
@@ -20,7 +23,7 @@ func registerHdlr(c *gin.Context) {
 		return
 	}
 
-	var user = User{
+	var user = database.User{
 		Username: username,
 		Password: password,
 		Email:    email,
@@ -35,12 +38,13 @@ func registerHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
-func profileHdlr(c *gin.Context) {
+func ProfileHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
-	user := User{}
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	user := database.User{}
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
@@ -48,12 +52,13 @@ func profileHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func udProfileHdlr(c *gin.Context) {
+func UdProfileHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
-	user := User{}
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	user := database.User{}
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
@@ -61,7 +66,7 @@ func udProfileHdlr(c *gin.Context) {
 	email := c.PostForm("email")
 	birthday, _ := time.Parse(time.RFC3339, c.PostForm("birthday"))
 
-	if err := db.Model(&user).Updates(User{Email: email, Birthday: birthday}).Error; err != nil {
+	if err := db.Model(&user).Updates(database.User{Email: email, Birthday: birthday}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
@@ -69,16 +74,17 @@ func udProfileHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func chpasswdHdlr(c *gin.Context) {
+func ChpasswdHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
 	opasswd := c.PostForm("orpassword")
 	cpasswd := c.PostForm("chpassword")
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
@@ -96,6 +102,6 @@ func chpasswdHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func logoutHdlr(c *gin.Context) {
+func LogoutHdlr(c *gin.Context) {
 
 }

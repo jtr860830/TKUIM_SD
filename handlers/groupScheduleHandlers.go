@@ -1,4 +1,4 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
@@ -6,11 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/appleboy/gin-jwt"
+	"github.com/jtr860830/LifePrint-Server/database"
+
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 )
 
-func getGroupScheduleHdlr(c *gin.Context) {
+func GetGroupScheduleHdlr(c *gin.Context) {
+	db := database.GetDB()
 	name := c.Query("name")
 
 	if name == "" {
@@ -18,9 +21,9 @@ func getGroupScheduleHdlr(c *gin.Context) {
 		return
 	}
 
-	group := Group{}
+	group := database.Group{}
 
-	if err := db.Set("gorm:auto_preload", true).Where(&Group{Name: name}).First(&group).Error; err != nil {
+	if err := db.Set("gorm:auto_preload", true).Where(&database.Group{Name: name}).First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
@@ -28,7 +31,8 @@ func getGroupScheduleHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, group.Schedule)
 }
 
-func addGroupScheduleHdlr(c *gin.Context) {
+func AddGroupScheduleHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -47,25 +51,25 @@ func addGroupScheduleHdlr(c *gin.Context) {
 		return
 	}
 
-	user := User{}
-	group := Group{}
+	user := database.User{}
+	group := database.Group{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+	if err := db.Where(&database.Group{Name: name}).First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
 
-	if err := db.Model(&group).Association("Schedule").Append(groupSchedule{
+	if err := db.Model(&group).Association("Schedule").Append(database.GroupSchedule{
 		SponsorID: user.ID,
 		Event:     event,
 		StartTime: startTime,
 		EndTime:   endTime,
-		Location: location{
+		Location: database.Location{
 			Name: lc,
 			E:    e,
 			N:    n,
@@ -80,7 +84,8 @@ func addGroupScheduleHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func addAllGroupScheduleHdlr(c *gin.Context) {
+func AddAllGroupScheduleHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -98,20 +103,20 @@ func addAllGroupScheduleHdlr(c *gin.Context) {
 		return
 	}
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Where(&User{Username: username}).Preload("Groups").First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).Preload("Groups").First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
 	for _, v := range user.Groups {
-		if err := db.Model(&v).Association("Schedule").Append(groupSchedule{
+		if err := db.Model(&v).Association("Schedule").Append(database.GroupSchedule{
 			SponsorID: user.ID,
 			Event:     event,
 			StartTime: startTime,
 			EndTime:   endTime,
-			Location: location{
+			Location: database.Location{
 				Name: lc,
 				E:    e,
 				N:    n,
@@ -127,7 +132,8 @@ func addAllGroupScheduleHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func rmGroupScheduleHdlr(c *gin.Context) {
+func RmGroupScheduleHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -139,21 +145,21 @@ func rmGroupScheduleHdlr(c *gin.Context) {
 	color := c.PostForm("color")
 	t := c.PostForm("type")
 
-	user := User{}
-	group := Group{}
-	schedule := groupSchedule{}
+	user := database.User{}
+	group := database.Group{}
+	schedule := database.GroupSchedule{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+	if err := db.Where(&database.Group{Name: name}).First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
 
-	if err := db.Where(&groupSchedule{
+	if err := db.Where(&database.GroupSchedule{
 		SponsorID: user.ID,
 		Event:     event,
 		StartTime: startTime,

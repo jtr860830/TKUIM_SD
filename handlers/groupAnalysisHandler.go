@@ -1,14 +1,17 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
 	"sort"
 	"time"
 
+	"github.com/jtr860830/LifePrint-Server/database"
+
 	"github.com/gin-gonic/gin"
 )
 
-func getGroupAnalysisHdlr(c *gin.Context) {
+func GetGroupAnalysisHdlr(c *gin.Context) {
+	db := database.GetDB()
 	name := c.Query("name")
 
 	if name == "" {
@@ -16,17 +19,17 @@ func getGroupAnalysisHdlr(c *gin.Context) {
 		return
 	}
 
-	group := Group{}
+	group := database.Group{}
 
-	if err := db.Where(&Group{Name: name}).Preload("Schedule").Preload("Users").First(&group).Error; err != nil {
+	if err := db.Where(&database.Group{Name: name}).Preload("Schedule").Preload("Users").First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
 
-	data := []gpAnlData{}
+	data := []database.GpAnlData{}
 
 	for k, v := range group.Users {
-		data = append(data, gpAnlData{Username: (*v).Username, Cnt: 0})
+		data = append(data, database.GpAnlData{Username: (*v).Username, Cnt: 0})
 		for _, c := range group.Schedule {
 			if (*v).ID == c.SponsorID {
 				data[k].Cnt++
@@ -41,7 +44,8 @@ func getGroupAnalysisHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
-func getGroupAnalysis2Hdlr(c *gin.Context) {
+func GetGroupAnalysis2Hdlr(c *gin.Context) {
+	db := database.GetDB()
 	name := c.Query("name")
 
 	if name == "" {
@@ -49,14 +53,14 @@ func getGroupAnalysis2Hdlr(c *gin.Context) {
 		return
 	}
 
-	group := Group{}
+	group := database.Group{}
 
-	if err := db.Where(&Group{Name: name}).Preload("Schedule").First(&group).Error; err != nil {
+	if err := db.Where(&database.Group{Name: name}).Preload("Schedule").First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
 
-	data := [12]gpAnl2Data{}
+	data := [12]database.GpAnl2Data{}
 
 	for _, v := range group.Schedule {
 		if v.StartTime.Year() == time.Now().Year() {

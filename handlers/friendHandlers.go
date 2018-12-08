@@ -1,18 +1,21 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
 
-	"github.com/appleboy/gin-jwt"
+	"github.com/jtr860830/LifePrint-Server/database"
+
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 )
 
-func getFriendHdlr(c *gin.Context) {
+func GetFriendHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
-	user := User{}
-	if err := db.Where(&User{Username: username}).Preload("Friend").First(&user).Error; err != nil {
+	user := database.User{}
+	if err := db.Where(&database.User{Username: username}).Preload("Friend").First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
@@ -25,20 +28,21 @@ func getFriendHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Friend)
 }
 
-func addFriendHdlr(c *gin.Context) {
+func AddFriendHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 	friendname := c.PostForm("username")
 
-	user := User{}
-	friend := User{}
+	user := database.User{}
+	friend := database.User{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&User{Username: friendname}).First(&friend).Error; err != nil {
+	if err := db.Where(&database.User{Username: friendname}).First(&friend).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Your friend is not exist"})
 		return
 	}
@@ -51,20 +55,21 @@ func addFriendHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func rmFriendHdlr(c *gin.Context) {
+func RmFriendHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 	friendname := c.PostForm("username")
 
-	user := User{}
-	friend := User{}
+	user := database.User{}
+	friend := database.User{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&User{Username: friendname}).First(&friend).Error; err != nil {
+	if err := db.Where(&database.User{Username: friendname}).First(&friend).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Your friend is not exist"})
 		return
 	}

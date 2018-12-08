@@ -1,4 +1,4 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
@@ -6,17 +6,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/appleboy/gin-jwt"
+	"github.com/jtr860830/LifePrint-Server/database"
+
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 )
 
-func getScheduleHdlr(c *gin.Context) {
+func GetScheduleHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Set("gorm:auto_preload", true).Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Set("gorm:auto_preload", true).Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
@@ -24,7 +27,8 @@ func getScheduleHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Schedule)
 }
 
-func addScheduleHdlr(c *gin.Context) {
+func AddScheduleHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -42,18 +46,18 @@ func addScheduleHdlr(c *gin.Context) {
 		return
 	}
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Model(&user).Association("Schedule").Append(userSchedule{
+	if err := db.Model(&user).Association("Schedule").Append(database.UserSchedule{
 		Event:     event,
 		StartTime: startTime,
 		EndTime:   endTime,
-		Location: location{
+		Location: database.Location{
 			Name: lc,
 			E:    e,
 			N:    n,
@@ -68,11 +72,12 @@ func addScheduleHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func udScheduleHdlr(c *gin.Context) {
+func UdScheduleHdlr(c *gin.Context) {
 
 }
 
-func rmScheduleHdlr(c *gin.Context) {
+func RmScheduleHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -83,15 +88,15 @@ func rmScheduleHdlr(c *gin.Context) {
 	color := c.PostForm("color")
 	t := c.PostForm("type")
 
-	user := User{}
-	schedule := userSchedule{}
+	user := database.User{}
+	schedule := database.UserSchedule{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&userSchedule{
+	if err := db.Where(&database.UserSchedule{
 		UserID:    user.ID,
 		Event:     event,
 		StartTime: startTime,

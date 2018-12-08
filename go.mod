@@ -1,4 +1,4 @@
-module github.com/jtr860830/SD-Backend
+module github.com/jtr860830/LifePrint-Server
 
 require (
 	cloud.google.com/go v0.27.0 // indirect

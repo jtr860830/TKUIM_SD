@@ -1,4 +1,4 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
@@ -6,18 +6,21 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/appleboy/gin-jwt"
+	"github.com/jtr860830/LifePrint-Server/database"
+
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 )
 
-func getBackupHdlr(c *gin.Context) {
+func GetBackupHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
-	user := User{}
-	bpData := []backup{}
+	user := database.User{}
+	bpData := []database.Backup{}
 
-	if err := db.Where(&User{Username: username}).Preload("Backup").First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).Preload("Backup").First(&user).Error; err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
 		return
 	}
@@ -30,7 +33,8 @@ func getBackupHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, bpData)
 }
 
-func addBackupHdlr(c *gin.Context) {
+func AddBackupHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -43,14 +47,14 @@ func addBackupHdlr(c *gin.Context) {
 		return
 	}
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Model(&user).Association("Backup").Append(backup{
+	if err := db.Model(&user).Association("Backup").Append(database.Backup{
 		Title:      title,
 		Info:       info,
 		Importance: importance,
@@ -62,7 +66,8 @@ func addBackupHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func rmBackupHdlr(c *gin.Context) {
+func RmBackupHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
@@ -70,15 +75,15 @@ func rmBackupHdlr(c *gin.Context) {
 	info := c.PostForm("info")
 	importance, _ := strconv.Atoi(c.PostForm("importance"))
 
-	user := User{}
-	bp := backup{}
+	user := database.User{}
+	bp := database.Backup{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&backup{
+	if err := db.Where(&database.Backup{
 		UserID:     user.ID,
 		Title:      title,
 		Info:       info,

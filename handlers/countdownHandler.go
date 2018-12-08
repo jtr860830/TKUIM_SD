@@ -1,22 +1,24 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
 	"sort"
 	"time"
 
-	"github.com/appleboy/gin-jwt"
+	"github.com/jtr860830/LifePrint-Server/database"
+
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-func cdHdlr(c *gin.Context) {
+func CdHdlr(c *gin.Context) {
+	db := database.GetDB()
 	claims := jwt.ExtractClaims(c)
 	username := claims["username"].(string)
 
-	user := User{}
+	user := database.User{}
 
-	if err := db.Set("gorm:auto_preload", true).Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Set("gorm:auto_preload", true).Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": "User not found"})
 		return
 	}
@@ -24,11 +26,11 @@ func cdHdlr(c *gin.Context) {
 	lower := time.Now()
 	upper := lower.Add(time.Hour * 24 * 7)
 
-	cd := []cdItem{}
+	cd := []database.CdItem{}
 
 	for _, v := range user.Schedule {
 		if t := v.StartTime; lower.Before(t) && upper.After(t) {
-			cd = append(cd, cdItem{
+			cd = append(cd, database.CdItem{
 				BelongsTo: "Personal",
 				Event:     v.Event,
 				StartTime: t,
@@ -41,7 +43,7 @@ func cdHdlr(c *gin.Context) {
 		db.Model(g).Related(&(*g).Schedule)
 		for _, v := range (*g).Schedule {
 			if t := v.StartTime; lower.Before(t) && upper.After(t) {
-				cd = append(cd, cdItem{
+				cd = append(cd, database.CdItem{
 					BelongsTo: (*g).Name,
 					Event:     v.Event,
 					StartTime: t,

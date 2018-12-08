@@ -1,12 +1,15 @@
-package main // import "github.com/jtr860830/SD-Backend"
+package handlers
 
 import (
 	"net/http"
 
+	"github.com/jtr860830/LifePrint-Server/database"
+
 	"github.com/gin-gonic/gin"
 )
 
-func getMemberHdlr(c *gin.Context) {
+func GetMemberHdlr(c *gin.Context) {
+	db := database.GetDB()
 	name := c.Query("name")
 
 	if name == "" {
@@ -14,9 +17,9 @@ func getMemberHdlr(c *gin.Context) {
 		return
 	}
 
-	group := Group{}
+	group := database.Group{}
 
-	if err := db.Where(&Group{Name: name}).Preload("Users").First(&group).Error; err != nil {
+	if err := db.Where(&database.Group{Name: name}).Preload("Users").First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
@@ -24,19 +27,20 @@ func getMemberHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, group.Users)
 }
 
-func addMemberHdlr(c *gin.Context) {
+func AddMemberHdlr(c *gin.Context) {
+	db := database.GetDB()
 	username := c.PostForm("username")
 	name := c.PostForm("name")
 
-	user := User{}
-	group := Group{}
+	user := database.User{}
+	group := database.Group{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+	if err := db.Where(&database.Group{Name: name}).First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
@@ -49,19 +53,20 @@ func addMemberHdlr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func rmMemberHdlr(c *gin.Context) {
+func RmMemberHdlr(c *gin.Context) {
+	db := database.GetDB()
 	username := c.PostForm("username")
 	name := c.PostForm("name")
 
-	user := User{}
-	group := Group{}
+	user := database.User{}
+	group := database.Group{}
 
-	if err := db.Where(&User{Username: username}).First(&user).Error; err != nil {
+	if err := db.Where(&database.User{Username: username}).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User not found"})
 		return
 	}
 
-	if err := db.Where(&Group{Name: name}).First(&group).Error; err != nil {
+	if err := db.Where(&database.Group{Name: name}).First(&group).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Group not found"})
 		return
 	}
