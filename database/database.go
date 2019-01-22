@@ -20,12 +20,12 @@ func init() {
 	if DBLC == "" {
 		DBLC = "root:password@/sd?charset=utf8&parseTime=True&loc=Local"
 	}
-
 	if DBMS == "" {
 		DBMS = "mysql"
 	}
 
-	DB, err := gorm.Open(DBMS, DBLC)
+	var err error
+	DB, err = gorm.Open(DBMS, DBLC)
 	for err != nil {
 		log.Println(err)
 		time.Sleep(time.Duration(5) * time.Second)

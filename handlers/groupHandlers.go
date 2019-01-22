@@ -3,10 +3,9 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/jtr860830/LifePrint-Server/database"
-
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
+	"github.com/jtr860830/LifePrint-Server/database"
 )
 
 func GetGroupHdlr(c *gin.Context) {

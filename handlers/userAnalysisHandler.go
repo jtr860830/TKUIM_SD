@@ -4,10 +4,9 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/jtr860830/LifePrint-Server/database"
-
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
+	"github.com/jtr860830/LifePrint-Server/database"
 )
 
 func GetUserAnalysisHdlr(c *gin.Context) {

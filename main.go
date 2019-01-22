@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jtr860830/LifePrint-Server/handlers"
-	"github.com/jtr860830/LifePrint-Server/database"
-
-	"github.com/appleboy/gin-jwt"
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jtr860830/LifePrint-Server/database"
+	"github.com/jtr860830/LifePrint-Server/handlers"
 )
 
 func main() {
