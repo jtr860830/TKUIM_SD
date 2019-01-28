@@ -16,9 +16,4 @@ Thanks for my group member's help.
 - [Ally Hsu](https://github.com/06a17y)
 
 ## License
-This project is licensed under the MIT License. But if your name or ID is in the list below and wanting to use this project, please pay me 1 million dollars.
-
-- 李佩芳
-- [juatsimplelove](https://github.com/juatsimplelove)
-- 王艾頎
-- [Athena0](https://github.com/Athena0)
+This project is licensed under the MIT License.
