@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jtr860830/LifePrint-Server/database"
+	"LifePrint-Server/database"
 )
 
 func GetGroupAnalysisHdlr(c *gin.Context) {

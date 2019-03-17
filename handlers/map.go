@@ -7,7 +7,7 @@ import (
 
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/jtr860830/LifePrint-Server/database"
+	"LifePrint-Server/database"
 )
 
 func AnlMap(c *gin.Context) {
